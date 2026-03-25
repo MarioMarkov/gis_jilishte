@@ -21,5 +21,6 @@ class GridCell(Base):
     score_shopping = Column(Float)
     score_healthcare = Column(Float)
     score_commute = Column(Float)
+    score_playground = Column(Float)
 
     __table_args__ = (UniqueConstraint("row_idx", "col_idx"),)

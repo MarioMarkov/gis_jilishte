@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
@@ -5,6 +6,9 @@ from alembic import context
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
+if url := os.environ.get("DATABASE_URL_SYNC"):
+    config.set_main_option("sqlalchemy.url", url)
 
 import app.models  # noqa: F401 - ensure all models are imported
 from app.database import Base

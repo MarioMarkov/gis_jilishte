@@ -9,11 +9,8 @@ const SCORE_LABELS: Record<string, string> = {
   transport: "Transport",
   parks: "Parks",
   education: "Education",
+  playground: "Playgrounds",
   air_quality: "Air Quality",
-  noise: "Noise",
-  shopping: "Shopping",
-  healthcare: "Healthcare",
-  commute: "Commute",
 };
 
 const POI_LABELS: Record<string, string> = {
@@ -21,9 +18,7 @@ const POI_LABELS: Record<string, string> = {
   park: "Parks",
   kindergarten: "Kindergartens",
   school: "Schools",
-  hospital: "Hospitals",
-  pharmacy: "Pharmacies",
-  supermarket: "Supermarkets",
+  playground: "Playgrounds",
 };
 
 function ScoreBar({ label, value }: { label: string; value: number }) {

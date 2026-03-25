@@ -11,11 +11,8 @@ CATEGORIES = [
     {"key": "transport", "label": "Metro & Public Transport", "label_bg": "Метро и транспорт", "default_weight": 5, "icon": "bus"},
     {"key": "parks", "label": "Parks & Green Spaces", "label_bg": "Паркове и зеленина", "default_weight": 4, "icon": "tree"},
     {"key": "education", "label": "Kindergartens & Schools", "label_bg": "Детски градини и училища", "default_weight": 4, "icon": "school"},
+    {"key": "playground", "label": "Playgrounds", "label_bg": "Детски площадки", "default_weight": 2, "icon": "playground"},
     {"key": "air_quality", "label": "Air Quality", "label_bg": "Качество на въздуха", "default_weight": 3, "icon": "wind"},
-    {"key": "noise", "label": "Noise Level", "label_bg": "Ниво на шум", "default_weight": 3, "icon": "volume"},
-    {"key": "shopping", "label": "Supermarkets & Shopping", "label_bg": "Магазини и пазаруване", "default_weight": 3, "icon": "cart"},
-    {"key": "healthcare", "label": "Healthcare", "label_bg": "Здравеопазване", "default_weight": 3, "icon": "hospital"},
-    {"key": "commute", "label": "Commute to Center", "label_bg": "Близост до центъра", "default_weight": 3, "icon": "compass"},
 ]
 
 

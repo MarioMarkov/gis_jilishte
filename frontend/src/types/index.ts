@@ -10,11 +10,8 @@ export interface CellScores {
   transport: number;
   parks: number;
   education: number;
+  playground: number;
   air_quality: number;
-  noise: number;
-  shopping: number;
-  healthcare: number;
-  commute: number;
 }
 
 export interface GridFeature {

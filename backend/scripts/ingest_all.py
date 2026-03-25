@@ -8,9 +8,8 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from app.ingestion.grid_generator import generate_grid
-from app.ingestion.overpass import fetch_pois
+from app.ingestion.sofiaplan import fetch_pois
 from app.ingestion.gtfs import fetch_transport_stops
-from app.ingestion.roads import fetch_major_roads
 from app.ingestion.air_quality import fetch_air_quality
 from app.ingestion.score_precomputer import compute_all_scores
 
@@ -20,22 +19,19 @@ def main():
     print("Sofia Apartment Recommender - Data Ingestion Pipeline")
     print("=" * 60)
 
-    print("\n[1/6] Generating grid cells...")
+    print("\n[1/5] Generating grid cells...")
     generate_grid()
 
-    print("\n[2/6] Fetching POIs from OpenStreetMap...")
+    print("\n[2/5] Fetching POIs from Sofia Plan API...")
     fetch_pois()
 
-    print("\n[3/6] Fetching transport stops...")
+    print("\n[3/5] Fetching transport stops...")
     fetch_transport_stops()
 
-    print("\n[4/6] Fetching major roads...")
-    fetch_major_roads()
-
-    print("\n[5/6] Fetching air quality data...")
+    print("\n[4/5] Fetching air quality data...")
     fetch_air_quality()
 
-    print("\n[6/6] Computing scores...")
+    print("\n[5/5] Computing scores...")
     compute_all_scores()
 
     print("\n" + "=" * 60)

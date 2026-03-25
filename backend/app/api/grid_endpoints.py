@@ -14,18 +14,14 @@ async def get_grid_scores(
     w_transport: float = Query(5, ge=0, le=10),
     w_parks: float = Query(4, ge=0, le=10),
     w_education: float = Query(4, ge=0, le=10),
+    w_playground: float = Query(2, ge=0, le=10),
     w_air_quality: float = Query(3, ge=0, le=10),
-    w_noise: float = Query(3, ge=0, le=10),
-    w_shopping: float = Query(3, ge=0, le=10),
-    w_healthcare: float = Query(3, ge=0, le=10),
-    w_commute: float = Query(3, ge=0, le=10),
     min_score: float = Query(0.0, ge=0, le=1),
     db: AsyncSession = Depends(get_db),
 ):
     params = WeightParams(
         w_transport=w_transport, w_parks=w_parks, w_education=w_education,
-        w_air_quality=w_air_quality, w_noise=w_noise, w_shopping=w_shopping,
-        w_healthcare=w_healthcare, w_commute=w_commute,
+        w_playground=w_playground, w_air_quality=w_air_quality,
     )
     weights = params.normalized()
 
@@ -36,22 +32,17 @@ async def get_grid_scores(
                COALESCE(score_transport, 0) * :wt
                + COALESCE(score_parks, 0) * :wp
                + COALESCE(score_education, 0) * :we
+               + COALESCE(score_playground, 0) * :wpg
                + COALESCE(score_air_quality, 0) * :wa
-               + COALESCE(score_noise, 0) * :wn
-               + COALESCE(score_shopping, 0) * :ws
-               + COALESCE(score_healthcare, 0) * :wh
-               + COALESCE(score_commute, 0) * :wc
                AS total_score,
                score_transport, score_parks, score_education,
-               score_air_quality, score_noise, score_shopping,
-               score_healthcare, score_commute
+               score_playground, score_air_quality
         FROM grid_cells
         WHERE score_transport IS NOT NULL
     """), {
         "wt": weights["transport"], "wp": weights["parks"],
-        "we": weights["education"], "wa": weights["air_quality"],
-        "wn": weights["noise"], "ws": weights["shopping"],
-        "wh": weights["healthcare"], "wc": weights["commute"],
+        "we": weights["education"], "wpg": weights["playground"],
+        "wa": weights["air_quality"],
     })
 
     rows = list(result)
@@ -82,11 +73,8 @@ async def get_grid_scores(
                     "transport": round(row.score_transport or 0, 4),
                     "parks": round(row.score_parks or 0, 4),
                     "education": round(row.score_education or 0, 4),
+                    "playground": round(row.score_playground or 0, 4),
                     "air_quality": round(row.score_air_quality or 0, 4),
-                    "noise": round(row.score_noise or 0, 4),
-                    "shopping": round(row.score_shopping or 0, 4),
-                    "healthcare": round(row.score_healthcare or 0, 4),
-                    "commute": round(row.score_commute or 0, 4),
                 },
             },
         })
@@ -104,8 +92,7 @@ async def get_cell_detail(
     cell = await db.execute(text("""
         SELECT row_idx, col_idx, ST_Y(centroid) as lat, ST_X(centroid) as lon,
                score_transport, score_parks, score_education,
-               score_air_quality, score_noise, score_shopping,
-               score_healthcare, score_commute
+               score_playground, score_air_quality
         FROM grid_cells WHERE row_idx = :row AND col_idx = :col
     """), {"row": row, "col": col})
     cell_row = cell.first()
@@ -114,7 +101,7 @@ async def get_cell_detail(
 
     # Get nearest POIs for each category
     nearby = {}
-    for category in ["park", "kindergarten", "school", "hospital", "pharmacy", "supermarket"]:
+    for category in ["park", "kindergarten", "school", "playground"]:
         pois = await db.execute(text("""
             SELECT name, ST_Distance(
                 (SELECT centroid::geography FROM grid_cells WHERE row_idx = :row AND col_idx = :col),
@@ -152,11 +139,8 @@ async def get_cell_detail(
             "transport": round(cell_row.score_transport or 0, 4),
             "parks": round(cell_row.score_parks or 0, 4),
             "education": round(cell_row.score_education or 0, 4),
+            "playground": round(cell_row.score_playground or 0, 4),
             "air_quality": round(cell_row.score_air_quality or 0, 4),
-            "noise": round(cell_row.score_noise or 0, 4),
-            "shopping": round(cell_row.score_shopping or 0, 4),
-            "healthcare": round(cell_row.score_healthcare or 0, 4),
-            "commute": round(cell_row.score_commute or 0, 4),
         },
         "nearby": nearby,
     }

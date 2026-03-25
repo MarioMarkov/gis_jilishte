@@ -1,4 +1,14 @@
 services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gis:gis@db:5432/jilishte
+      DATABASE_URL_SYNC: postgresql://gis:gis@db:5432/jilishte
+    depends_on:
+      - db
+
   db:
     image: postgis/postgis:16-3.4
     environment:

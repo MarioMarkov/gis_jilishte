@@ -15,6 +15,7 @@ def compute_all_scores():
         _compute_shopping(session)
         _compute_healthcare(session)
         _compute_commute(session)
+        _compute_playground(session)
 
         scored = session.execute(text(
             "SELECT COUNT(*) FROM grid_cells WHERE score_transport IS NOT NULL"
@@ -210,6 +211,26 @@ def _compute_commute(session):
     """))
     session.commit()
     print("  -> commute scores done")
+
+
+def _compute_playground(session):
+    """Playground score: nearest playground proximity (0.6) + count within 500m (0.4)."""
+    print("Computing playground scores...")
+    session.execute(text("""
+        UPDATE grid_cells g SET score_playground = sub.score FROM (
+            SELECT g.id,
+                COALESCE(0.6 * GREATEST(0, 1.0 - MIN(ST_Distance(g.centroid::geography, p.geom::geography)) / 1000.0), 0)
+                + 0.4 * LEAST(
+                    COUNT(CASE WHEN ST_DWithin(g.centroid::geography, p.geom::geography, 500) THEN 1 END)::real / 3.0,
+                    1.0
+                ) AS score
+            FROM grid_cells g
+            LEFT JOIN pois p ON p.category = 'playground' AND ST_DWithin(g.centroid::geography, p.geom::geography, 1500)
+            GROUP BY g.id
+        ) sub WHERE g.id = sub.id
+    """))
+    session.commit()
+    print("  -> playground scores done")
 
 
 if __name__ == "__main__":
